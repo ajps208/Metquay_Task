@@ -31,14 +31,14 @@ TicketMate is a vibrant web application designed to provide a delightful user in
 ## 📷 Preview
 
 <div classname="d-flex flex-row">
-  <img src="public/asset/Screenshot%202024-01-07%20222039.png" alt="TicketMate Preview" width="400" height="200">
-  <img src="public/asset/Screenshot 2024-01-07 222101.png" alt="TicketMate Preview" width="400" height="200">
+  <a href="https://ibb.co/nBvh11V"><img src="https://i.ibb.co/PMnBWWb/Screenshot-2024-01-07-222039.png" alt="Screenshot-2024-01-07-222039" border="0"></a>
+ <a href="https://ibb.co/DfmXx3d"><img src="https://i.ibb.co/wh8H9Dt/Screenshot-2024-01-07-222101.png" alt="Screenshot-2024-01-07-222101" border="0"></a>
 </div>
 
 
 ## 🛠 Getting Started
 
-1. **Clone the repository:** `git clone https://github.com/ajps208/Ticket-Book.git`
+1. **Clone the repository:** `git clone https://github.com/ajps208/Metquay_Task.git`
 2. **Navigate to the project directory:** `cd ticketmate`
 3. **Install dependencies for the server:** `npm install`
 4. **Navigate to the client directory:** `cd client`
@@ -51,7 +51,7 @@ TicketMate is a vibrant web application designed to provide a delightful user in
 
 ## Backend Repository 🖥️
 The backend code for Ticketmate is available in a separate repository. Explore and contribute to the backend here:
-[(backend_repository_link)](https://github.com/ajps208/Ticket-server)
+[(backend_repository_link)](https://github.com/ajps208/Metquay_Task.git)
 
 ## ▶️ Usage
 
