@@ -1,0 +1,14 @@
+body {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  font-family: "Nunito", sans-serif;
+  font-family: "Oswald", sans-serif;
+  font-family: "Playpen Sans", cursive;
+  font-family: "Sofia Sans", sans-serif;
+ 
+}
+body::-webkit-scrollbar {
+  display: none;
+}

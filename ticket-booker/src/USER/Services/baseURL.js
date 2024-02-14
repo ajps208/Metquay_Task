@@ -1,0 +1,1 @@
+export const BASE_URL="https://tk-server-t2mp.onrender.com"
