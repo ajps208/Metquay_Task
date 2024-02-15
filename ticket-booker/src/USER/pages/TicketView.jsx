@@ -6,20 +6,21 @@ import { useParams } from "react-router-dom";
 import { oneEventAPI, paymentAPI } from "../Services/allApi";
 import { BASE_URL } from "../Services/baseURL";
 import { loadStripe } from "@stripe/stripe-js";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import BasicExample from "../components/Header";
-
 function TicketView() {
-  
+  // Retrieve the 'id' parameter from the URL using the useParams hook
   const { id } = useParams();
+
+  // State variables to manage ticket information, selected seat, number of tickets, token, and ticket price
   const [ticket, setTicket] = useState({});
   const [seat, setSeat] = useState(undefined); // Updated to handle 'undefined' instead of 'null'
   const [noOfTickets, setNoOfTickets] = useState(1);
   const [token, setToken] = useState("");
   const [ticketprice, setTicketPrice] = useState("");
-  
 
+  // Function to fetch event details based on the 'id' parameter
   const oneEventCall = async () => {
     try {
       const result = await oneEventAPI(id);
@@ -34,50 +35,57 @@ function TicketView() {
     }
   };
 
+  // Function to initiate the payment process
   const makePayment = async () => {
     try {
+      // Load Stripe instance with the publishable key
       const stripe = await loadStripe(
         "pk_test_51OGkHMSHKWNdPynwVi6PmahTtkOQAeAENEBXD91iC4ddSRPZ4gJTkzZ3snBRpEAqT7K1zFO1jy0WHdmU49410jf400XvEgzrrF"
       );
-  
-      if (seat === null || seat === undefined || seat === "SELECT YOUR CATEGORY") {
-        // Handle the case where no seat is selected
+
+      // Check if seat selection is valid
+      if (
+        seat === null ||
+        seat === undefined ||
+        seat === "SELECT YOUR CATEGORY"
+      ) {
         toast.info("Please select a seat before making the payment");
         return;
       }
-  
+
+      // Prepare request body for payment
       const reqBody = {
         ticketprice: ticketprice,
         noOfTickets: noOfTickets,
         seat: seat,
         ticket: ticket,
       };
-  
+
+      // Prepare request header with authorization token
       const reqHeader = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       };
-  
+
+      // Make a request to the paymentAPI
       const response = await paymentAPI(reqBody, reqHeader);
-  
+
+      // Validate session response
       if (!response.data || !response.data.id) {
         console.error("Invalid session response from the server");
         return;
       }
-  
+
+      // Redirect to Stripe checkout page with the session ID
       const result = await stripe.redirectToCheckout({
         sessionId: response.data.id,
       });
-  
     } catch (error) {
       console.error(error);
-      
     }
   };
-  
-  
-  
 
+  // Effect hook to set the token from sessionStorage when the component mounts
   useEffect(() => {
     if (sessionStorage.getItem("token")) {
       setToken(sessionStorage.getItem("token"));
@@ -86,20 +94,29 @@ function TicketView() {
     }
   }, []);
 
+  // Effect hook to fetch event details when the 'id' parameter changes
   useEffect(() => {
     oneEventCall();
   }, [id]);
+
+  // Effect hook to calculate the total ticket price when seat, number of tickets, or ticket details change
   useEffect(() => {
-   
     const totalTicketPrice =
       ticket.price && seat !== undefined ? ticket.price[seat] * noOfTickets : 0;
-  
+
     setTicketPrice(totalTicketPrice);
   }, [seat, noOfTickets, ticket]);
 
   return (
-    <div  style={{minHeight:"100vh",backgroundColor:" #130f40",backgroundImage: "linear-gradient(315deg, #130f40 0%, #000000 74%)",color:"white"}}>
-        <BasicExample/>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: " #130f40",
+        backgroundImage: "linear-gradient(315deg, #130f40 0%, #000000 74%)",
+        color: "white",
+      }}
+    >
+      <BasicExample />
 
       <Container style={{ maxWidth: "80%" }} className="mt-5">
         <Row>
@@ -178,8 +195,10 @@ function TicketView() {
                 </div>
               </div>
             </div>
-            <h4 className="mt-3" style={{color:"#8c8c8c"}}>About</h4>
-            <p style={{color:"#8c8c8c"}}>{ticket.description}</p>
+            <h4 className="mt-3" style={{ color: "#8c8c8c" }}>
+              About
+            </h4>
+            <p style={{ color: "#8c8c8c" }}>{ticket.description}</p>
           </Col>
           <Col
             sm={12}
@@ -210,13 +229,11 @@ function TicketView() {
               <div className="d-flex align-items-center justify-content-center  mt-3 ">
                 <div className="d-flex flex-column align-items-center justify-content-center mt-3">
                   <div
-                    style={{ backgroundColor: "#000000",color:"wheat"}}
+                    style={{ backgroundColor: "#000000", color: "wheat" }}
                     className="d-flex flex-column align-items-center justify-content-center border p-3 rounded "
                   >
                     <div className="d-flex  align-items-center justify-content-center">
-                      <span className="me-2 fs-5 ">
-                        No of tickets:
-                      </span>
+                      <span className="me-2 fs-5 ">No of tickets:</span>
                       <button
                         className="btn btn-info fs-4"
                         onClick={() =>
@@ -225,7 +242,9 @@ function TicketView() {
                       >
                         -
                       </button>
-                      <p style={{color:"wheat"}} className="fs-5 m-2">{noOfTickets}</p>
+                      <p style={{ color: "wheat" }} className="fs-5 m-2">
+                        {noOfTickets}
+                      </p>
                       <button
                         className="btn btn-info fs-4"
                         onClick={() => setNoOfTickets(noOfTickets + 1)}
@@ -234,26 +253,25 @@ function TicketView() {
                       </button>
                     </div>
                     <input
-                     
                       style={{
                         backgroundColor: "#000000",
                         textAlign: "center", // Center text
                         border: "none", // Remove border
                         outline: "none", // Remove outline on focus
                         cursor: "default", // Disable hover effect
-                        color:"white"
+                        color: "white",
                       }}
                       type="text"
                       className="form-control w-100 m-2 fs-4"
                       value={`Price: ${ticketprice} ₹`}
-                      
                     />
                   </div>
                 </div>
               </div>
               <button
-              disabled={ticket.qty && seat !== undefined
-                &&ticket.qty[seat] === 0}
+                disabled={
+                  ticket.qty && seat !== undefined && ticket.qty[seat] === 0
+                }
                 onClick={makePayment}
                 className="w-100 mt-4 btn btn-primary"
               >
@@ -301,8 +319,7 @@ function TicketView() {
           </Col>
         </Row>
       </Container>
-      <ToastContainer position='top-right' autoClose={2000} theme='colored' />
-
+      <ToastContainer position="top-right" autoClose={2000} theme="colored" />
     </div>
   );
 }

@@ -5,7 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 
-function Forgotpassword() {
+function ForgotPassword() {
+  // State variables for managing OTP and password change process
   const [randomNumber, setRandomNumber] = useState(null);
   const [otpEntered, setOtpEntered] = useState("");
   const [email, setEmail] = useState("");
@@ -14,52 +15,57 @@ function Forgotpassword() {
   const [password, setPassword] = useState("");
   const [cpassword, setCpassword] = useState("");
 
+  // Function to send OTP to the user's email
   const handleOtpSend = async () => {
+    // Generate a random 4-digit number as OTP
     const newRandomNumber = Math.floor(Math.random() * 9000) + 1000;
     setRandomNumber(newRandomNumber);
 
     try {
+      // Prepare email data with the OTP
       const emailData = {
         to: `${email}`,
-        html: `<p>OTP for changing the password <b>${newRandomNumber}</b> </p>`, // Use newRandomNumber here
+        html: `<p>OTP for changing the password <b>${newRandomNumber}</b> </p>`,
       };
 
+      // Send the OTP email
       const emailResult = await sendotpAPI(emailData);
       if (emailResult.status === 200) {
-        // console.log("Email sent:", emailResult);
-        setEmailStatus(true);
+        setEmailStatus(true); // Set email status to true if the email is sent successfully
       }
     } catch (error) {
       console.error("Error sending email:", error);
     }
   };
+
+  // Function to verify the entered OTP
   const verifyOtp = () => {
     if (randomNumber == otpEntered) {
-      setPswdChange(true);
-      alert("correct");
-      setRandomNumber(null);
+      setPswdChange(true); // Set password change flag to true if OTP is correct
+      alert("correct"); // Notify the user that the OTP entered is correct
+      setRandomNumber(null); // Reset the random number and OTP entered
       setOtpEntered("");
     } else {
-      toast.info("Entered otp is not correct");
+      toast.info("Entered otp is not correct"); // Notify the user if the entered OTP is incorrect
     }
   };
 
-  const updatePassword=async()=>{
-   if(password==cpassword){
-    console.log("correct password")
-    const reqBody={
+  // Function to update the password
+  const updatePassword = async () => {
+    if (password == cpassword) {
+      console.log("correct password");
+      const reqBody = {
         email,
-        password
+        password,
+      };
+      const result = await changePasswordAPI(reqBody); // Call the API to change the password
+      if (result.status === 200) {
+        toast.success("Password Changed"); // Notify the user if the password is changed successfully
+      } else {
+        toast.error(result.data); // Notify the user if there's an error changing the password
+      }
     }
-    const result=await chanhePaawordAPI(reqBody)
-    if(result.status===200){
-        toast.success("Password Changed")
-    }else{
-        toast.error(result.data)
-    }
-   }
-  }
-  // console.log(randomNumber);
+  };
 
   return (
     <>
@@ -101,66 +107,101 @@ function Forgotpassword() {
           style={{ height: "100vh" }}
           className=" d-flex justify-content-center align-items-center"
         >
-         <section className="vh-100  " style={{backgroundColor: "#eee;"}}>
-  <div className="container h-100">
-    
-    <div className="row d-flex justify-content-center align-items-center h-100">
-      
-      <div className="col-lg-12 col-xl-11">
-      <Link to={'/'} style={{ textDecoration: "none" ,color:"red"}}><i classNameName="fa-solid fa-arrow-left me-1"></i> Back to Home    </Link>
+          <section className="vh-100  " style={{ backgroundColor: "#eee;" }}>
+            <div className="container h-100">
+              <div className="row d-flex justify-content-center align-items-center h-100">
+                <div className="col-lg-12 col-xl-11">
+                  <Link
+                    to={"/"}
+                    style={{ textDecoration: "none", color: "red" }}
+                  >
+                    <i classNameName="fa-solid fa-arrow-left me-1"></i> Back to
+                    Home{" "}
+                  </Link>
 
-        <div className="card text-black" style={{borderRadius:" 25px;"}}>
-          <div className="card-body p-md-5">
-            <div className="row justify-content-center">
-              <div className="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+                  <div
+                    className="card text-black"
+                    style={{ borderRadius: " 25px;" }}
+                  >
+                    <div className="card-body p-md-5">
+                      <div className="row justify-content-center">
+                        <div className="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+                          <p className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">
+                            Change Password
+                          </p>
 
-                <p className="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Change Password</p>
+                          <form className="mx-1 mx-md-4">
+                            <div className="d-flex flex-row align-items-center mb-4 ">
+                              <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
+                              <div className="form-outline flex-fill mb-0">
+                                <input
+                                  type="password"
+                                  id="form3Example4c"
+                                  className="form-control"
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  minlength="8"
+                                  required
+                                />
+                                <div className="d-flex justify-content-between">
+                                  <label
+                                    className="form-label"
+                                    for="form3Example4c"
+                                  >
+                                    Password
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="d-flex flex-row align-items-center mb-4 ">
+                              <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
+                              <div className="form-outline flex-fill mb-0">
+                                <input
+                                  type="password"
+                                  id="form3Example4c"
+                                  className="form-control"
+                                  onChange={(e) => setCpassword(e.target.value)}
+                                />
+                                <div className="d-flex justify-content-between">
+                                  <label
+                                    className="form-label"
+                                    for="form3Example4c"
+                                  >
+                                    Confirm Password
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
 
-                <form className="mx-1 mx-md-4">
-
-
-
-                  <div className="d-flex flex-row align-items-center mb-4 ">
-                    <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
-                    <div className="form-outline flex-fill mb-0">
-                      <input type="password" id="form3Example4c" className="form-control" onChange={e=>setPassword(e.target.value)} minlength="8" required/>
-                     <div className='d-flex justify-content-between'>
-                        <label className="form-label" for="form3Example4c">Password</label>
-                     </div>
+                            <div className="d-flex flex-column justify-content-center mx-4 mb-3 mb-lg-4">
+                              <button
+                                type="button"
+                                onClick={updatePassword}
+                                className="btn mx-4 btn-primary btn-lg"
+                              >
+                                Change Password
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                        <div className="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+                          <img
+                            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
+                            className="img-fluid"
+                            alt="Sample image"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="d-flex flex-row align-items-center mb-4 ">
-                    <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
-                    <div className="form-outline flex-fill mb-0">
-                      <input type="password" id="form3Example4c" className="form-control" onChange={e=>setCpassword(e.target.value)} />
-                     <div className='d-flex justify-content-between'>
-                        <label className="form-label" for="form3Example4c">Confirm Password</label>
-                     </div>
-                    </div>
-                  </div>
-
-                 <div className="d-flex flex-column justify-content-center mx-4 mb-3 mb-lg-4">
-                    <button type="button" onClick={updatePassword}  className="btn mx-4 btn-primary btn-lg">Change Password</button>
-                  </div>
-                 
-                </form>
-
-              </div>
-              <div className="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
-
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
-                  className="img-fluid" alt="Sample image"/>
-
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <ToastContainer position='top-right' autoClose={2000} theme='colored' />
-
-</section>
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              theme="colored"
+            />
+          </section>
         </Container>
       )}
       <ToastContainer position="top-right" autoClose={2000} theme="colored" />

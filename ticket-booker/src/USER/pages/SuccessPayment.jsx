@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { addOrdersAPI, editEventAPI, sendEmailAPI } from '../Services/allApi';
-import BasicExample from '../components/Header';
+import React, { useEffect, useState } from "react";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { addOrdersAPI, editEventAPI, sendEmailAPI } from "../Services/allApi";
+import BasicExample from "../components/Header";
 
 function SuccessPayment() {
   const [ticket, setTicket] = useState(null);
@@ -19,13 +19,13 @@ function SuccessPayment() {
   useEffect(() => {
     // Extract query parameters from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    const ticketParam = urlParams.get('ticket');
-    const paymentIdParam = urlParams.get('payment_id');
-    const seatnameParam = urlParams.get('seatno');
-    const userIdParam = urlParams.get('userId');
-    const noOfTicketsParam = urlParams.get('noOfTickets');
-    const ticketPriceParam = urlParams.get('ticketprice');
-    const dateParam = urlParams.get('date');
+    const ticketParam = urlParams.get("ticket");
+    const paymentIdParam = urlParams.get("payment_id");
+    const seatnameParam = urlParams.get("seatno");
+    const userIdParam = urlParams.get("userId");
+    const noOfTicketsParam = urlParams.get("noOfTickets");
+    const ticketPriceParam = urlParams.get("ticketprice");
+    const dateParam = urlParams.get("date");
 
     // Decode and parse the ticket parameter
     if (ticketParam) {
@@ -75,7 +75,7 @@ function SuccessPayment() {
     const token = sessionStorage.getItem("token");
     const reqHeader = {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     };
     const result = await addOrdersAPI(reqBody, reqHeader);
     if (result.status === 200) {
@@ -83,51 +83,45 @@ function SuccessPayment() {
     }
   };
 
+  // decrease seats along with no of tickets
+  const handleChangeSeatNos = async () => {
+    if (!ticket || !ticket.qty || !seatname) {
+      console.error("Ticket information is not available.");
+      return;
+    }
 
- // decrease seats along with no of tickets
- const handleChangeSeatNos = async () => {
-  if (!ticket || !ticket.qty || !seatname) {
-    console.error("Ticket information is not available.");
-    return;
-  }
+    const newSeatAmount = ticket.qty[seatname] - noOfTickets;
+    // console.log("newSeatAmount", newSeatAmount);
 
-  const newSeatAmount = ticket.qty[seatname] - noOfTickets;
-  // console.log("newSeatAmount", newSeatAmount);
+    const updatedQty = ticket.qty.map(Number); // Convert string values to numbers
+    updatedQty[seatname] = newSeatAmount;
 
-  const updatedQty = ticket.qty.map(Number); // Convert string values to numbers
-  updatedQty[seatname] = newSeatAmount;
+    const updatedTicket = { ...ticket, qty: updatedQty };
+    // console.log(updatedTicket);
+    setTicket(updatedTicket);
 
-  const updatedTicket = { ...ticket, qty: updatedQty };
-  // console.log(updatedTicket);
-  setTicket(updatedTicket);
+    const reqBody = { ticket, ticketQty: updatedQty };
+    const token = sessionStorage.getItem("token");
+    const reqHeader = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
 
-  const reqBody = { ticket,ticketQty: updatedQty};
-  const token = sessionStorage.getItem("token");
-  const reqHeader = {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`,
+    // api call for edit
+    const result = await editEventAPI(reqBody, reqHeader);
+    if (result.status === 200) {
+      handeleSendEmail();
+    }
   };
 
-  // api call for edit
-  const result = await editEventAPI(reqBody, reqHeader);
-  if( result.status===200){
-    handeleSendEmail()
+  const handeleSendEmail = async () => {
+    const existingUser = JSON.parse(sessionStorage.getItem("existingUser"));
+    const recipientemail = existingUser.email;
 
-  }
-};
-
-
-
-
-const handeleSendEmail=async()=>{
-
-  const existingUser = JSON.parse(sessionStorage.getItem("existingUser"));
-  const recipientemail = existingUser.email;
-  
-  try {
-    const emailData = {
-      to: `${recipientemail}`,
-      html: `<p>Thank you for your order! Here are the ticket details:</p>
+    try {
+      const emailData = {
+        to: `${recipientemail}`,
+        html: `<p>Thank you for your order! Here are the ticket details:</p>
         <ul>
           <li><strong>Name:</strong> ${ticket.name}</li>
           <li><strong>Seat:</strong> ${ticket.seat[seatname]}</li>
@@ -138,19 +132,16 @@ const handeleSendEmail=async()=>{
           <li><strong>Reference Id:</strong> ${paymentId}</li><br/>
           <p>Consider this mail as Your Ticket</P>
         </ul>`,
-    };
+      };
 
-    const emailResult = await sendEmailAPI(emailData);
-    if(emailResult.status===200){
-      setEmailStattus(true)
+      const emailResult = await sendEmailAPI(emailData);
+      if (emailResult.status === 200) {
+        setEmailStattus(true);
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
     }
-
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
-};
-
-
+  };
 
   useEffect(() => {
     if (ticket) {
@@ -164,70 +155,89 @@ const handeleSendEmail=async()=>{
 
   // style
   const containerStyle = {
-    maxWidth: '80%', // Adjusted for responsiveness
-    margin: 'auto',
-    padding: '20px',
-    backgroundColor: '#f8f9fa',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    borderRadius: '8px',
+    maxWidth: "80%", // Adjusted for responsiveness
+    margin: "auto",
+    padding: "20px",
+    backgroundColor: "#f8f9fa",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    borderRadius: "8px",
   };
 
   const headingStyle = {
-    fontSize: '28px', // Adjusted for responsiveness
-    textAlign: 'center',
-    color: '#28a745',
-    marginBottom: '20px',
+    fontSize: "28px", // Adjusted for responsiveness
+    textAlign: "center",
+    color: "#28a745",
+    marginBottom: "20px",
   };
 
   const sectionStyle = {
-    marginBottom: '20px',
+    marginBottom: "20px",
   };
 
   const subheadingStyle = {
-    fontSize: '20px', // Adjusted for responsiveness
-    color: '#007bff',
-    marginBottom: '10px',
+    fontSize: "20px", // Adjusted for responsiveness
+    color: "#007bff",
+    marginBottom: "10px",
   };
 
   const textStyle = {
-    fontSize: '16px', // Adjusted for responsiveness
+    fontSize: "16px", // Adjusted for responsiveness
   };
 
   return (
-    
-   <>
-       <BasicExample/>
+    <>
+      <BasicExample />
 
-      <Container className='mt-5' style={containerStyle}>
+      <Container className="mt-5" style={containerStyle}>
         <Row>
           <Col xs={12} sm={12} md={12} lg={12}>
-            <h4 style={headingStyle}><i class="fa-regular fa-circle-check"></i> Payment Success</h4>
+            <h4 style={headingStyle}>
+              <i class="fa-regular fa-circle-check"></i> Payment Success
+            </h4>
             {ticket && (
               <div style={sectionStyle}>
                 <h2 style={subheadingStyle}>Ticket Information</h2>
-                <p style={textStyle}><span className=''>Event</span>: <span className='text-uppercase text-muted'>{ticket.name}</span></p>
+                <p style={textStyle}>
+                  <span className="">Event</span>:{" "}
+                  <span className="text-uppercase text-muted">
+                    {ticket.name}
+                  </span>
+                </p>
                 {/* Add more ticket information as needed */}
               </div>
             )}
             {seatname && (
-              <p style={textStyle}>Seat Name: <span className='text-muted'>{ticket.seat[seatname]}</span></p>
+              <p style={textStyle}>
+                Seat Name:{" "}
+                <span className="text-muted">{ticket.seat[seatname]}</span>
+              </p>
             )}
             {noOfTickets && (
-              <p style={textStyle}>Number of Tickets:<span className='text-muted'> {noOfTickets}</span></p>
+              <p style={textStyle}>
+                Number of Tickets:
+                <span className="text-muted"> {noOfTickets}</span>
+              </p>
             )}
             {ticketprice && (
-              <p style={textStyle}>Ticket Price:<span className='text-muted'> {ticketprice} ₹</span></p>
+              <p style={textStyle}>
+                Ticket Price:
+                <span className="text-muted"> {ticketprice} ₹</span>
+              </p>
             )}
             {paymentId && (
               <div style={sectionStyle}>
-                <p style={{ ...textStyle, wordBreak: 'break-all' }}>Reference ID: <span className='text-muted'>{paymentId}</span></p>
+                <p style={{ ...textStyle, wordBreak: "break-all" }}>
+                  Reference ID: <span className="text-muted">{paymentId}</span>
+                </p>
               </div>
             )}
           </Col>
         </Row>
-        {!emailStatus&& <h4 className='text-success'>Ticket has been sent to your email</h4>}
+        {!emailStatus && (
+          <h4 className="text-success">Ticket has been sent to your email</h4>
+        )}
       </Container>
-   </>
+    </>
   );
 }
 

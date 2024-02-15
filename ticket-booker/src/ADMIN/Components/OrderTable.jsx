@@ -1,31 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'datatables.net-bs4/css/dataTables.bootstrap4.min.css';
-import { completeOrderAPI } from '../../USER/Services/allApi';
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "datatables.net-bs4/css/dataTables.bootstrap4.min.css";
+import { completeOrderAPI } from "../../USER/Services/allApi";
 
 const DataTableComponent = () => {
+  // State variables
   const [ordersData, setOrderData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch orders data from API
   const fetchData = async () => {
     try {
       const result = await completeOrderAPI();
-      console.log('API Result:', result);
+      console.log("API Result:", result);
 
       if (result.status === 200) {
-        const sortedOrders = result.data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        // Sort orders by order date
+        const sortedOrders = result.data.sort(
+          (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+        );
 
         setOrderData(sortedOrders);
       }
     } catch (error) {
-      console.error('API Error:', error);
+      console.error("API Error:", error);
     }
   };
 
+  // Fetch data on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Filter orders based on search term
   const filteredOrders = ordersData.filter(
     (order) =>
       order.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -38,14 +45,14 @@ const DataTableComponent = () => {
   );
 
   return (
-    <div className='w-100'>
+    <div className="w-100">
       <div>
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search..."
-          className='form-control w-25 mb-4 mt-4'
+          className="form-control w-25 mb-4 mt-4"
         />
       </div>
       {filteredOrders.length > 0 ? (

@@ -1,45 +1,31 @@
 const admins=require('../Model/adminSchema')
 const jwt=require('jsonwebtoken')
 
-// exports.register=async(req,res)=>{
-//     console.log("inside the admin register controller function");
-//     const {email,password}=req.body
-//     try {
-//         const existingUser=await admins.findOne({email})
-//         if(existingUser){
-//             res.status(406).json("Account already exists !!!")
-//         }else{
-//             const newUser=new admins({
-//                 email,password
-//             })
-//             await newUser.save()
-//             res.status(200).json(newUser)
-//         }
-        
-//     } catch (error) {
-//         res.status(200).json(`Register Api failed, Error ${error}`)
-//     }
-
-// }
- exports.login=async(req,res)=>{
+exports.login = async (req, res) => {
     console.log("inside Adminlogin function");
-    const {email,password}=req.body
+    const { email, password } = req.body; // Destructuring email and password from request body
     console.log(req.body);
+
     try {
-        const existingAdmin=await admins.findOne({email,password})
-         if(existingAdmin){
-            // console.log("inside function");
-            const token=jwt.sign({adminId:existingAdmin._id},"supersecretkey12345")
+        // Finding an existing admin with the provided email and password
+        const existingAdmin = await admins.findOne({ email, password });
+
+        if (existingAdmin) {
+            // If an existing admin is found, generate a JWT token
+            const token = jwt.sign({ adminId: existingAdmin._id }, "supersecretkey12345");
+
+            // Respond with status 200 and send the existing admin data and token
             res.status(200).json({
-                existingAdmin,token
-            })
-         }else{
-            res.status(404).json("incorrect Email / Password")
-         }
-
+                existingAdmin,
+                token
+            });
+        } else {
+            // If no admin found with the provided credentials, respond with status 404
+            res.status(404).json("Incorrect Email / Password");
+        }
     } catch (error) {
+        // Catch and handle any errors that occur during the process
         console.log(error);
-        res.status(401).json(`login api failed : ${err}`)
-
+        res.status(401).json(`Login API failed: ${error}`); // Respond with status 401 and error message
     }
-}
+};
